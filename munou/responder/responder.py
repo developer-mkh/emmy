@@ -1,12 +1,14 @@
-from builtins import open
+import re
+
 from munou.util import select_random
 
 
 class Responder:
-    def __init__(self, name):
+    def __init__(self, name, dictionary):
         self._name = name
+        self._dictionary = dictionary
 
-    def response(self, input):
+    def response(self, input_message):
         return ""
 
     def name(self):
@@ -14,22 +16,30 @@ class Responder:
 
 
 class WhatResponder(Responder):
-    def __init__(self, name):
-        Responder.__init__(self, name)
+    def __init__(self, name, dictionary):
+        Responder.__init__(self, name, dictionary)
 
-    def response(self, input):
-        return input + "ってなに？"
+    def response(self, input_message):
+        return input_message + "ってなに？"
 
 
 class RandomResponder(Responder):
-    def __init__(self, my_name, dictionary_file_name):
-        Responder.__init__(self, my_name)
-        self._response = []
-        with open(dictionary_file_name, "r", encoding="UTF-8") as f:
-            for line in f:
-                line = line.rstrip()
-                if line != "":
-                    self._response.append(line)
+    def __init__(self, name, dictionary):
+        Responder.__init__(self, name, dictionary)
 
-    def response(self, input):
-        return select_random(self._response)
+    def response(self, input_message):
+        return select_random(self._dictionary.random())
+
+
+class PatternResponder(Responder):
+    def __init__(self, name, dictionary):
+        Responder.__init__(self, name, dictionary)
+
+    def response(self, input_message):
+        for line in self._dictionary.pattern():
+            m = re.search(line[0], input_message)
+            if m is not None:
+                resp = select_random(line[1].split("|"))
+                return re.sub("%match%", m.group(0), resp)
+
+        return select_random(self._dictionary.random())

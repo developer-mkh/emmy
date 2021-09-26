@@ -1,13 +1,15 @@
 from builtins import print, input, len, FileNotFoundError, exit
 
-from munou.unmo import unmo
+from munou.unmo import emmy
 
 
-file_path = "../work/random.txt"
+random_file_path = "../work/random.txt"
+pattern_file_path = "../work/pattern.txt"
+
 try:
-    _unmo = unmo.Proto("proto", file_path)
+    _unmo = emmy.Proto("proto", random_file_path, pattern_file_path)
 except FileNotFoundError as e:
-    print('"' + file_path + '"' + " is not found.")
+    print('"' + random_file_path + '"' + " or " + '"' + pattern_file_path + '"' + " is not found.")
     exit(-1)
 
 while True:
