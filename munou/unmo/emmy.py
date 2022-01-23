@@ -1,6 +1,7 @@
 import random
 
 from munou.responder import responder, dictionary
+from munou.unmo import emotion
 
 
 def _prompt(name):
@@ -12,6 +13,7 @@ class Proto:
     def __init__(self, name, random_file_name, pattern_file_name):
         self._name = name
         self._dictionary = dictionary.Dictionary(random_file_name, pattern_file_name)
+        self._emotion = emotion.Emotion(self._dictionary)
 
         self._resp_what = responder.WhatResponder("what", self._dictionary)
         self._resp_random = responder.RandomResponder("Random", self._dictionary)
@@ -20,6 +22,8 @@ class Proto:
         self._responder = self._resp_pattern
 
     def dialogue(self, input_message):
+        self._emotion.update(input_message)
+
         probability = random.randint(0, 99)
         if probability <= 59:
             self._responder = self._resp_pattern
@@ -28,7 +32,7 @@ class Proto:
         else:
             self._responder = self._resp_what
 
-        return self._responder.response(input_message)
+        return self._responder.response(input_message, self._emotion.mood())
 
     def responder_name(self):
         return self._responder.name()
